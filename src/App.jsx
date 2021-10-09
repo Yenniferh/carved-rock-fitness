@@ -7,9 +7,12 @@ import { getProducts } from './services/productService';
 export default function App() {
   const [size, setSize] = useState('');
   const [products, setProducts] = useState([]);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    getProducts('shoes').then((response) => setProducts(response));
+    getProducts('shoes')
+      .then((response) => setProducts(response))
+      .catch((e) => setError(e));
   }, []);
 
   function renderProduct(p) {
@@ -27,6 +30,8 @@ export default function App() {
   const filteredProducts = size
     ? products.filter((p) => p.skus.find((s) => s.size === parseInt(size)))
     : products;
+
+  if (error) throw error;
 
   return (
     <>
