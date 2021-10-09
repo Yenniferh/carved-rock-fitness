@@ -3,16 +3,26 @@ import './App.css';
 import Footer from './Footer';
 import Header from './Header';
 import { getProducts } from './services/productService';
+import Spinner from './Spinner';
 
 export default function App() {
   const [size, setSize] = useState('');
   const [products, setProducts] = useState([]);
   const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getProducts('shoes')
-      .then((response) => setProducts(response))
-      .catch((e) => setError(e));
+    async function init() {
+      try {
+        const response = await getProducts('shoes');
+        setProducts(response);
+      } catch (error) {
+        setError(error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    init();
   }, []);
 
   function renderProduct(p) {
@@ -52,7 +62,9 @@ export default function App() {
             </select>
             {size && <h2>Found {filteredProducts.length} items</h2>}
           </section>
-          <section id='products'>{filteredProducts.map(renderProduct)}</section>
+          <section id='products'>
+            {loading ? <Spinner /> : filteredProducts.map(renderProduct)}
+          </section>
         </main>
       </div>
       <Footer />
